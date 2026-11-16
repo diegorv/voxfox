@@ -1,4 +1,5 @@
 import Defuddle from "defuddle";
+import { Readability } from "@mozilla/readability";
 
 const MAX_CHUNK = 300; // characters; keeps each Kokoro call well under its 510-token limit
 const FIRST_CHUNK = 140; // a short first chunk gets audio started fast
@@ -34,31 +35,41 @@ export function extractPage() {
     return { title: document.title, blocks: selection.split(/\n\s*\n|\n/).map(normalize).filter(Boolean), source: "selection" };
   }
 
-  let title = document.title;
-  let blocks = [];
-  try {
-    // Defuddle needs the live document (computed styles, mobile CSS) but extracts
-    // from its own clone. Synchronous parse() never fetches from the network.
-    const article = new Defuddle(document).parse();
-    if (article?.content) {
-      // Parse into an inert document so nothing in the content loads or runs.
-      blocks = blocksFrom(new DOMParser().parseFromString(article.content, "text/html").body);
-      if (article.title) title = article.title;
-      // Lead with the title unless the content already opens with it. Either may be
-      // the longer one: the tab title often carries a " | Site" suffix.
-      const first = blocks[0]?.replace(/\.$/, "") ?? "";
-      if (title && !(first && (first.startsWith(title) || title.startsWith(first)))) blocks.unshift(title.endsWith(".") ? title : title + ".");
+  // Each extractor gets a turn until one finds real content; under 200
+  // characters means it missed.
+  for (const [name, extract] of EXTRACTORS) {
+    try {
+      const article = extract();
+      if (!article?.content) continue;
+      const title = article.title || document.title;
+      const blocks = articleBlocks(article.content, title);
+      if (blocks.join(" ").length >= 200) return { title, blocks, source: "page" };
+    } catch (err) {
+      console.warn(`[VoxFox] ${name} failed`, err);
     }
-  } catch (err) {
-    console.warn("[VoxFox] Defuddle failed", err);
   }
 
-  // Plan B: Defuddle failed or found almost nothing; read the page's main area.
-  if (blocks.join(" ").length < 200) {
-    const main = document.querySelector("main, article, [role=main]") || document.body;
-    blocks = blocksFrom(main);
-  }
-  return { title, blocks, source: "page" };
+  // Plan C: read the page's main area as is.
+  const main = document.querySelector("main, article, [role=main]") || document.body;
+  return { title: document.title, blocks: blocksFrom(main), source: "page" };
+}
+
+const EXTRACTORS = [
+  // Defuddle needs the live document (computed styles, mobile CSS) but extracts
+  // from its own clone. Synchronous parse() never fetches from the network.
+  ["Defuddle", () => new Defuddle(document).parse()],
+  // Plan B. Readability modifies the document it is given.
+  ["Readability", () => new Readability(document.cloneNode(true), { charThreshold: 200 }).parse()],
+];
+
+function articleBlocks(html, title) {
+  // Parse into an inert document so nothing in the content loads or runs.
+  const blocks = blocksFrom(new DOMParser().parseFromString(html, "text/html").body);
+  // Lead with the title unless the content already opens with it. Either may be
+  // the longer one: the tab title often carries a " | Site" suffix.
+  const first = blocks[0]?.replace(/\.$/, "") ?? "";
+  if (title && !(first && (first.startsWith(title) || title.startsWith(first)))) blocks.unshift(title.endsWith(".") ? title : title + ".");
+  return blocks;
 }
 
 function splitSentences(text) {

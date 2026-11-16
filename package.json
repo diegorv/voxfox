@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@echogarden/espeak-ng-emscripten": "0.3.5",
+    "@mozilla/readability": "0.6.0",
     "defuddle": "0.19.6",
     "kokoro-js": "^1.2.1"
   },
