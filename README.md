@@ -13,7 +13,7 @@ no account, no API key, and no text sent to a server.
 - **Read a selection**: highlight text first, or right-click → *Listen to selection*.
 - **Floating player** with skip back/forward, speed (0.75×–2×), and a voice picker.
 - **Follows along** by highlighting and scrolling to the paragraph being read.
-- **22 English voices** (American and British).
+- **22 English voices** (American and British) and **2 Brazilian Portuguese voices** (Dora and Alex).
 - **Fast**: uses WebGPU when available (≈6× faster than real time) and falls back to CPU (WASM).
 
 ## Development
@@ -53,4 +53,5 @@ ONNX Runtime's WASM files are bundled in `dist/ort/`, so no executable code is l
 
 ## License
 
-[MIT](LICENSE) © Kaspars Dancis. The Kokoro model and `kokoro-js` are Apache-2.0.
+[MIT](LICENSE) © Kaspars Dancis. The Kokoro model and `kokoro-js` are Apache-2.0. Portuguese phonemes
+come from [eSpeak NG](https://github.com/espeak-ng/espeak-ng) (via `@echogarden/espeak-ng-emscripten`), which is GPL-3.0.

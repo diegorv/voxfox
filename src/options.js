@@ -1,4 +1,4 @@
-import { DEFAULTS, VOICES, getSettings, SHORTCUT_LABEL } from "./settings.js";
+import { DEFAULTS, VOICES, VOICE_GROUPS, getSettings, SHORTCUT_LABEL } from "./settings.js";
 
 const $ = (id) => document.getElementById(id);
 const voiceSel = $("voice");
@@ -7,13 +7,13 @@ const speedOut = $("speedOut");
 const engine = $("engine");
 const saved = $("saved");
 
-for (const group of ["American", "British"]) {
+for (const group of VOICE_GROUPS) {
   const og = document.createElement("optgroup");
-  og.label = `${group} English`;
-  for (const v of VOICES.filter((v) => v.accent === group)) {
+  og.label = group.label;
+  for (const v of VOICES.filter((v) => v.accent === group.accent)) {
     const o = document.createElement("option");
     o.value = v.id;
-    o.textContent = `${v.name} · ${v.gender === "F" ? "female" : "male"} · grade ${v.grade}`;
+    o.textContent = `${v.name} · ${v.gender === "F" ? "female" : "male"}${v.grade ? ` · grade ${v.grade}` : ""}`;
     og.append(o);
   }
   voiceSel.append(og);
@@ -44,7 +44,9 @@ $("preview").addEventListener("click", () => {
     type: "voxfox:preview",
     voice: v.id,
     speed: Number(speed.value) || DEFAULTS.speed,
-    text: `Hi, I'm ${v.name}. With VoxFox, any page becomes something you can listen to.`,
+    text: v.accent === "Brazilian"
+      ? `Oi, eu sou ${v.gender === "F" ? "a" : "o"} ${v.name}. Com o VoxFox, qualquer página vira algo que você pode ouvir.`
+      : `Hi, I'm ${v.name}. With VoxFox, any page becomes something you can listen to.`,
   });
 });
 

@@ -1,6 +1,7 @@
 import * as esbuild from "esbuild";
 import { cpSync, mkdirSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { slimEspeak, ESPEAK_JS } from "./espeak-pt.mjs";
 
 const watch = process.argv.includes("--watch");
 const out = "dist";
@@ -24,6 +25,17 @@ for (const f of ["ort-wasm-simd-threaded.jsep.mjs", "ort-wasm-simd-threaded.jsep
   cpSync(`node_modules/onnxruntime-web/dist/${f}`, `${out}/ort/${f}`);
 }
 
+// eSpeak-NG for Portuguese phonemes, cut down to the pt-BR data (see espeak-pt.mjs).
+const espeak = slimEspeak();
+writeFileSync(`${out}/espeak-ng.data`, espeak.data);
+const espeakPlugin = {
+  name: "espeak-pt",
+  setup(build) {
+    build.onLoad({ filter: /espeak-ng\.js$/ }, (args) =>
+      args.path === ESPEAK_JS ? { contents: espeak.js, loader: "js" } : undefined);
+  },
+};
+
 const common = {
   bundle: true,
   target: "chrome116",
@@ -39,7 +51,7 @@ const builds = [
   { entryPoints: ["src/background.js"], outfile: `${out}/background.js`, format: "esm" },
   { entryPoints: ["src/content.js"], outfile: `${out}/content.js`, format: "iife" },
   { entryPoints: ["src/offscreen.js"], outfile: `${out}/offscreen.js`, format: "esm" },
-  { entryPoints: ["src/tts-worker.js"], outfile: `${out}/tts-worker.js`, format: "esm" },
+  { entryPoints: ["src/tts-worker.js"], outfile: `${out}/tts-worker.js`, format: "esm", plugins: [espeakPlugin], external: ["module"] }, // eSpeak's Node-only branch
   { entryPoints: ["src/options.js"], outfile: `${out}/options.js`, format: "esm" },
 ];
 

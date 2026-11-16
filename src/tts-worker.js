@@ -1,6 +1,10 @@
 // Runs Kokoro inside a dedicated Web Worker so speech generation never blocks
 // audio playback or the offscreen document's message handling.
 import { KokoroTTS, env } from "kokoro-js";
+import createEspeak from "@echogarden/espeak-ng-emscripten";
+import { createPtPhonemizer } from "./phonemize-pt.js";
+
+const phonemizePt = createPtPhonemizer(createEspeak);
 
 const MODEL_ID = "onnx-community/Kokoro-82M-v1.0-ONNX";
 
@@ -71,7 +75,12 @@ self.onmessage = async (e) => {
       await load(msg.engine);
     } else if (msg.type === "generate") {
       const model = await load(msg.engine);
-      const audio = await model.generate(msg.text, { voice: msg.voice, speed: msg.speed ?? 1 });
+      const options = { voice: msg.voice, speed: msg.speed ?? 1 };
+      // kokoro-js rejects non-English voices in generate(), but generate_from_ids()
+      // takes any voice from the model repo, so Portuguese is phonemized here.
+      const audio = msg.voice.startsWith("p")
+        ? await model.generate_from_ids(model.tokenizer(await phonemizePt(msg.text), { truncation: true }).input_ids, options)
+        : await model.generate(msg.text, options);
       const samples = audio.audio;
       postMessage(
         { type: "audio", id: msg.id, samples, sampleRate: audio.sampling_rate },

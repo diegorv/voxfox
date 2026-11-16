@@ -34,6 +34,14 @@ export const VOICES = [
   { id: "bm_fable", name: "Fable", accent: "British", gender: "M", grade: "C" },
   { id: "bm_lewis", name: "Lewis", accent: "British", gender: "M", grade: "D+" },
   { id: "bm_daniel", name: "Daniel", accent: "British", gender: "M", grade: "D" },
+  { id: "pf_dora", name: "Dora", accent: "Brazilian", gender: "F" },
+  { id: "pm_alex", name: "Alex", accent: "Brazilian", gender: "M" },
+];
+
+export const VOICE_GROUPS = [
+  { accent: "American", label: "American English", short: "American" },
+  { accent: "British", label: "British English", short: "British" },
+  { accent: "Brazilian", label: "Brazilian Portuguese", short: "Português (BR)" },
 ];
 
 export const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || "");

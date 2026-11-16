@@ -1,5 +1,5 @@
 import { extractPage, chunkBlocks } from "./extract.js";
-import { SPEEDS, VOICES, SHORTCUT_LABEL } from "./settings.js";
+import { SPEEDS, VOICES, VOICE_GROUPS, SHORTCUT_LABEL } from "./settings.js";
 
 // The script may be injected more than once per page; only set up once.
 if (!window.__voxfox) {
@@ -65,10 +65,10 @@ function setup() {
       track: $(".track"),
     };
 
-    for (const group of ["American", "British"]) {
+    for (const group of VOICE_GROUPS) {
       const og = document.createElement("optgroup");
-      og.label = group;
-      for (const v of VOICES.filter((v) => v.accent === group)) {
+      og.label = group.short;
+      for (const v of VOICES.filter((v) => v.accent === group.accent)) {
         const o = document.createElement("option");
         o.value = v.id;
         o.textContent = `${v.name} ${v.gender === "F" ? "♀" : "♂"}`;
