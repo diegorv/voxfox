@@ -1,4 +1,4 @@
-import { Readability, isProbablyReaderable } from "@mozilla/readability";
+import Defuddle from "defuddle";
 
 const MAX_CHUNK = 300; // characters; keeps each Kokoro call well under its 510-token limit
 const FIRST_CHUNK = 140; // a short first chunk gets audio started fast
@@ -37,20 +37,24 @@ export function extractPage() {
   let title = document.title;
   let blocks = [];
   try {
-    const clone = document.cloneNode(true);
-    const article = new Readability(clone, { charThreshold: 200 }).parse();
+    // Defuddle needs the live document (computed styles, mobile CSS) but extracts
+    // from its own clone. Synchronous parse() never fetches from the network.
+    const article = new Defuddle(document).parse();
     if (article?.content) {
-      const container = document.createElement("div");
-      container.innerHTML = article.content;
-      blocks = blocksFrom(container);
+      // Parse into an inert document so nothing in the content loads or runs.
+      blocks = blocksFrom(new DOMParser().parseFromString(article.content, "text/html").body);
       if (article.title) title = article.title;
-      if (title && blocks[0] !== title && !blocks[0]?.startsWith(title)) blocks.unshift(title.endsWith(".") ? title : title + ".");
+      // Lead with the title unless the content already opens with it. Either may be
+      // the longer one: the tab title often carries a " | Site" suffix.
+      const first = blocks[0]?.replace(/\.$/, "") ?? "";
+      if (title && !(first && (first.startsWith(title) || title.startsWith(first)))) blocks.unshift(title.endsWith(".") ? title : title + ".");
     }
   } catch (err) {
-    console.warn("[VoxFox] Readability failed", err);
+    console.warn("[VoxFox] Defuddle failed", err);
   }
 
-  if (!blocks.length || (!isProbablyReaderable(document) && blocks.join(" ").length < 200)) {
+  // Plan B: Defuddle failed or found almost nothing; read the page's main area.
+  if (blocks.join(" ").length < 200) {
     const main = document.querySelector("main, article, [role=main]") || document.body;
     blocks = blocksFrom(main);
   }
