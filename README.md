@@ -83,6 +83,6 @@ executable code is loaded from a CDN (required by Manifest V3).
 
 ## License
 
-[MIT](LICENSE) © Kaspars Dancis, original author. The Kokoro model, `kokoro-js` and Mozilla Readability
+[MIT](LICENSE) © Kaspars Dancis (original author) and Diego R. v. (fork changes). The Kokoro model, `kokoro-js` and Mozilla Readability
 are Apache-2.0; Defuddle is MIT. Portuguese phonemes come from [eSpeak NG](https://github.com/espeak-ng/espeak-ng)
 (via `@echogarden/espeak-ng-emscripten`), which is GPL-3.0.
