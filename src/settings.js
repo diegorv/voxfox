@@ -2,6 +2,7 @@ export const DEFAULTS = {
   voice: "af_heart",
   speed: 1,
   engine: "auto", // "auto" | "webgpu" | "wasm"
+  enabledVoices: null, // voice ids listed in the player; null = all
 };
 
 export async function getSettings() {
@@ -43,6 +44,12 @@ export const VOICE_GROUPS = [
   { accent: "British", label: "British English", short: "British" },
   { accent: "Brazilian", label: "Brazilian Portuguese", short: "Português (BR)" },
 ];
+
+// The current voice is always listed so the player's menu can display it.
+export function playerVoices(enabledVoices, currentVoice) {
+  if (!enabledVoices) return VOICES;
+  return VOICES.filter((v) => v.id === currentVoice || enabledVoices.includes(v.id));
+}
 
 export const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || "");
 export const SHORTCUT_LABEL = IS_MAC ? "⌃⌘V" : "Alt+Shift+V";

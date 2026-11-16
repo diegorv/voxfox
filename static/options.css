@@ -23,4 +23,10 @@ input[type=range] { accent-color: var(--accent); width: 100%; }
 a { color: var(--accent-d); }
 .track { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; margin-top: 14px; }
 .fill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+#voiceList fieldset { border: 0; margin: 14px 0 0; padding: 0; }
+#voiceList legend { font-weight: 500; padding: 0; margin-bottom: 6px; }
+.checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 4px 12px; }
+.checks label { font-weight: 400; display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.checks input { accent-color: var(--accent); margin: 0; }
+.checks input:disabled + span { color: var(--muted); }
 .saved { color: var(--muted); font-size: 13px; text-align: center; min-height: 20px; }

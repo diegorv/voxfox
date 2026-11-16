@@ -1,5 +1,5 @@
 import { extractPage, chunkBlocks } from "./extract.js";
-import { SPEEDS, VOICES, VOICE_GROUPS, SHORTCUT_LABEL } from "./settings.js";
+import { SPEEDS, VOICE_GROUPS, SHORTCUT_LABEL, playerVoices } from "./settings.js";
 
 // The script may be injected more than once per page; only set up once.
 if (!window.__voxfox) {
@@ -65,18 +65,6 @@ function setup() {
       track: $(".track"),
     };
 
-    for (const group of VOICE_GROUPS) {
-      const og = document.createElement("optgroup");
-      og.label = group.short;
-      for (const v of VOICES.filter((v) => v.accent === group.accent)) {
-        const o = document.createElement("option");
-        o.value = v.id;
-        o.textContent = `${v.name} ${v.gender === "F" ? "♀" : "♂"}`;
-        og.append(o);
-      }
-      ui.voice.append(og);
-    }
-
     root.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-a]");
       if (btn) control(btn.dataset.a === "toggle" && lastState.status === "error" ? "restart" : btn.dataset.a);
@@ -91,9 +79,24 @@ function setup() {
     ui.voice.addEventListener("change", () => control("setVoice", { voice: ui.voice.value }));
 
     document.documentElement.append(host);
-    chrome.storage.sync.get({ speed: 1, voice: "af_heart" }).then((s) => {
+    chrome.storage.sync.get({ speed: 1, voice: "af_heart", enabledVoices: null }).then((s) => {
+      const current = lastState.voice || s.voice;
+      const voices = playerVoices(s.enabledVoices, current);
+      for (const group of VOICE_GROUPS) {
+        const inGroup = voices.filter((v) => v.accent === group.accent);
+        if (!inGroup.length) continue;
+        const og = document.createElement("optgroup");
+        og.label = group.short;
+        for (const v of inGroup) {
+          const o = document.createElement("option");
+          o.value = v.id;
+          o.textContent = `${v.name} ${v.gender === "F" ? "♀" : "♂"}`;
+          og.append(o);
+        }
+        ui.voice.append(og);
+      }
+      ui.voice.value = current;
       if (lastState.speed == null) ui.speed.textContent = `${s.speed}×`;
-      if (!lastState.voice) ui.voice.value = s.voice;
     });
   }
 

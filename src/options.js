@@ -33,7 +33,46 @@ async function save(patch) {
   savedTimer = setTimeout(() => (saved.textContent = ""), 1200);
 }
 
-voiceSel.addEventListener("change", () => save({ voice: voiceSel.value }));
+// "Voices in the player" checklist. The narrator's box is locked on, so the
+// player's menu always contains the voice that is reading.
+const enabled = new Set(s.enabledVoices ?? VOICES.map((v) => v.id));
+const checks = new Map();
+const enabledList = () => VOICES.map((v) => v.id).filter((id) => enabled.has(id));
+for (const group of VOICE_GROUPS) {
+  const fs = document.createElement("fieldset");
+  fs.innerHTML = `<legend>${group.label}</legend><div class="checks"></div>`;
+  for (const v of VOICES.filter((v) => v.accent === group.accent)) {
+    const label = document.createElement("label");
+    const box = document.createElement("input");
+    box.type = "checkbox";
+    box.value = v.id;
+    box.addEventListener("change", () => {
+      box.checked ? enabled.add(v.id) : enabled.delete(v.id);
+      save({ enabledVoices: enabledList() });
+    });
+    const name = document.createElement("span");
+    name.textContent = `${v.name} ${v.gender === "F" ? "♀" : "♂"}`;
+    label.append(box, name);
+    fs.querySelector(".checks").append(label);
+    checks.set(v.id, box);
+  }
+  $("voiceList").append(fs);
+}
+
+function syncChecks() {
+  enabled.add(voiceSel.value);
+  for (const [id, box] of checks) {
+    box.checked = enabled.has(id);
+    box.disabled = id === voiceSel.value;
+    box.parentElement.title = box.disabled ? "The narrator is always in the player" : "";
+  }
+}
+syncChecks();
+
+voiceSel.addEventListener("change", () => {
+  syncChecks();
+  save({ voice: voiceSel.value, enabledVoices: enabledList() });
+});
 speed.addEventListener("input", () => (speedOut.textContent = `${Number(speed.value).toFixed(2)}×`));
 speed.addEventListener("change", () => save({ speed: Number(speed.value) }));
 engine.addEventListener("change", () => save({ engine: engine.value }));
