@@ -176,11 +176,11 @@ const ICONS = {
 };
 
 const FOX_SVG = `<svg viewBox="0 0 64 64" aria-hidden="true">
-  <path fill="#f97316" d="M8 6l16 14h16L56 6l-2 28c0 13-10 24-22 24S10 47 10 34z"/>
-  <path fill="#fff7ed" d="M14 34c6 0 12 4 18 12 6-8 12-12 18-12-1 11-8 20-18 20S15 45 14 34z"/>
-  <path fill="#7c2d12" d="M12 11l9 9-8 4zM52 11l-9 9 8 4z" opacity=".55"/>
-  <circle cx="23" cy="32" r="3" fill="#1c1917"/><circle cx="41" cy="32" r="3" fill="#1c1917"/>
-  <path fill="#1c1917" d="M29 45h6l-3 3.5z"/>
+  <path fill="#009c3b" d="M8 6l16 14h16L56 6l-2 28c0 13-10 24-22 24S10 47 10 34z"/>
+  <path fill="#ffdf00" d="M14 34c6 0 12 4 18 12 6-8 12-12 18-12-1 11-8 20-18 20S15 45 14 34z"/>
+  <path fill="#002776" d="M12 11l9 9-8 4zM52 11l-9 9 8 4z"/>
+  <circle cx="23" cy="32" r="3" fill="#002776"/><circle cx="41" cy="32" r="3" fill="#002776"/>
+  <path fill="#002776" d="M29 45h6l-3 3.5z"/>
 </svg>`;
 
 const CSS = `
