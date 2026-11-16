@@ -5,6 +5,7 @@
   "description": "Listen to any webpage with a single click. Natural on-device voices powered by Kokoro.",
   "type": "module",
   "dependencies": {
+    "@echogarden/espeak-ng-emscripten": "0.3.5",
     "@mozilla/readability": "^0.6.0",
     "kokoro-js": "^1.2.1"
   },
@@ -17,6 +18,7 @@
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
     "icons": "node scripts/icons.mjs",
-    "zip": "npm run build && cd dist && zip -qr ../voxfox.zip ."
+    "zip": "npm run build && cd dist && zip -qr ../voxfox.zip .",
+    "test": "node --test test/*.test.mjs"
   }
 }
