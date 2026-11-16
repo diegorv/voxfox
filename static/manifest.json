@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "VoxFox",
   "short_name": "VoxFox",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Listen to any webpage with a single click. Natural voices that run privately on your device.",
   "icons": {
     "16": "icons/icon-16.png",
