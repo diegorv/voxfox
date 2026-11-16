@@ -34,6 +34,8 @@ Version 0.2.0, compared with the original 0.1.0:
 - **New extraction chain.** Selection first, then Defuddle, then Readability if Defuddle fails or
   finds under 200 characters, then a plain scan of `<main>`/`<article>`/`<body>`. Extraction never
   touches the network or changes the page, and both are covered by tests.
+  [Defuddle](https://github.com/kepano/defuddle), from the Obsidian Web Clipper, is more forgiving
+  than Readability: it removes fewer uncertain elements and standardizes footnotes, code blocks and math.
 - **No log noise on the extension's Errors page.** ONNX Runtime warnings and a transformers.js
   download warning no longer show up there; real errors still do.
 - **Brazil-colored fox** for the toolbar icon and the player.
